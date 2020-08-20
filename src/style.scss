@@ -1,0 +1,668 @@
+@import "reset";
+
+$main-pink: #f67599;
+$main-black: #2a2a2a;
+$light-gray: #808080;
+$neutrals-gray: #afb1bd;
+$placeholder: #999999;
+$border-color: #f0f0f5;
+$input-border: #5e5e5e;
+
+%makeBurger {
+  position: absolute;
+  content: "";
+  background-color: $main-black;
+  height: 2px;
+}
+%flexCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+%mobileTitle {
+  font-size: 24px;
+  color: $main-black;
+  font-weight: bold;
+}
+%inputStyle {
+  border-radius: 4px;
+  border: 1px solid #5e5e5e;
+  height: 40px;
+}
+$form-list: user-title name phone email city address title;
+
+@mixin stepNum($stepNum) {
+  @for $i from 1 through $stepNum {
+    &:nth-child(#{$i}) .step-circle::after {
+      content: "#{$i}";
+    }
+  }
+}
+
+/*********** 共用元素 **************/
+::placeholder {
+  color: #999999;
+  font-size: 12px;
+}
+input {
+  -webkit-appearance: none;
+  padding-left: 8px;
+  width: 100%;
+  @extend %inputStyle;
+
+  &[type="radio"] {
+    cursor: pointer;
+    border-radius: 50%;
+    height: 20px;
+    width: 20px;
+    &:checked {
+      box-shadow: inset 0 0 0 6px $main-black;
+    }
+  }
+}
+select {
+  -webkit-appearance: none;
+  cursor: pointer;
+  width: 100%;
+  padding-left: 8px;
+  background-color: transparent;
+  @extend %inputStyle;
+
+  &:invalid {
+    color: $placeholder;
+  }
+}
+.select-wrapper {
+  background-color: transparent;
+  position: relative;
+  &::after {
+    position: absolute;
+    content: "\25BE";
+    top: calc(50% - 12px);
+    right: 12px;
+    z-index: -1;
+  }
+}
+
+/*---------- header ----------*/
+header {
+  background-color: khaki;
+  width: 100%;
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  z-index: 999;
+
+  /* nav-list-toggle */
+  .nav-toggle-label {
+    width: 20px;
+    height: 15px;
+    position: absolute;
+    top: 18px;
+    left: 5%;
+    align-items: center;
+
+    .hamburger {
+      width: 20px;
+      height: 2px;
+      background-color: $main-black;
+      position: relative;
+      &::after {
+        @extend %makeBurger;
+        width: 15px;
+        top: 6px;
+      }
+      &::before {
+        @extend %makeBurger;
+        width: 10px;
+        top: 12px;
+      }
+    }
+  }
+  .nav-toggle {
+    display: none;
+    &:checked {
+      ~ .nav > .nav-list-left,
+      ~ .nav > .nav-list-right {
+        background-color: white;
+        margin: auto -15%;
+        transform: scale(1, 1);
+        .nav-item {
+          opacity: 1;
+          transition: opacity 0.3s ease-out 0.15s;
+        }
+      }
+    }
+  }
+
+  /* nav-list */
+  .nav {
+    display: flex;
+    flex-direction: column;
+    width: 85%;
+    margin-top: 56px;
+  }
+  .nav-list-main {
+    position: absolute;
+    top: 12.5px;
+    width: 135px;
+    height: 25px;
+    left: calc(50% - 67.5px);
+  }
+  .nav-list-left,
+  .nav-list-right {
+    transform: scale(1, 0);
+    transform-origin: top;
+    transition: transform 0.3s ease-out;
+
+    .nav-item {
+      opacity: 0;
+      height: 70px;
+      border-bottom: 2px solid $border-color;
+      @extend %flexCenter;
+    }
+    .nav-item-icon {
+      display: grid;
+      grid-template-columns: 20px 20px 20px;
+      grid-gap: 43px;
+      border: none;
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+/*---------- main ----------*/
+.main-content {
+  height: 100vh;
+  overflow-y: scroll;
+  top: 56px;
+  padding-top: 56px;
+  margin-bottom: 10px;
+}
+
+.stepper-panel {
+  .step-title {
+    @extend %mobileTitle;
+    margin: 15px;
+  }
+  .stepper-content {
+    padding: 0px 15px;
+    display: grid;
+    grid-template-columns: 32px minmax(32px, 1fr) 32px;
+
+    .step {
+      @include stepNum(3);
+      position: relative;
+
+      .step-circle {
+        @extend %flexCenter;
+        width: 32px;
+        height: 32px;
+        border: 1px solid $main-black;
+        border-radius: 50%;
+        margin-bottom: 32px;
+      }
+      &.checked {
+        .step-circle {
+          background-color: $main-black;
+        }
+        .step-circle::after {
+          content: "\2713";
+          color: $border-color;
+        }
+      }
+      &.active {
+        .step-circle {
+          background-color: $main-black;
+          color: $border-color;
+        }
+      }
+      .connect-line {
+        flex: 1;
+        background-color: $border-color;
+        margin: 16px 15px;
+        height: 2px;
+
+        &.active {
+          background-color: $main-black;
+        }
+      }
+    }
+  }
+}
+
+form {
+  padding: 0 20px;
+
+  .part-a {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 0.5fr repeat(5, 1fr);
+    grid-gap: 0.5rem 1rem;
+
+    grid-template-areas:
+      "title title "
+      "user-title name"
+      "phone phone"
+      "email email"
+      "city city"
+      "address address";
+
+    @each $name in $form-list {
+      .#{$name} {
+        grid-area: #{$name};
+      }
+    }
+  }
+  .part {
+    margin-bottom: 32px;
+
+    .part-title {
+      margin-bottom: 15px;
+    }
+    .title {
+      @extend %mobileTitle;
+    }
+    .form-item {
+      > label {
+        color: $light-gray;
+        font-size: 12px;
+      }
+      input,
+      select {
+        margin-top: 8px;
+      }
+      .shipping-option {
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        padding: 11px 20px;
+        height: 60px;
+        display: grid;
+        align-items: center;
+        grid-template-columns: 55px 1fr 55px;
+        grid-template-rows: 1fr 1fr;
+        grid-template-areas:
+          "radio title price"
+          "radio description description";
+
+        .radio {
+          grid-area: radio;
+          justify-self: start;
+        }
+        .title {
+          grid-area: title;
+          font-size: 14px;
+        }
+        .price {
+          grid-area: price;
+          font-size: 12px;
+          justify-self: end;
+        }
+        .description {
+          font-size: 12px;
+          grid-area: description;
+        }
+      }
+    }
+  }
+}
+
+.cart-container {
+  border: 1px solid $border-color;
+  margin: 0px 20px 32px 20px;
+  padding: 9px 16px;
+  border-radius: 8px;
+
+  .cart-item {
+    padding: 9px 0px;
+    display: flex;
+  }
+  img {
+    width: 100px;
+    margin-right: 5px;
+  }
+  .cart-detail {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .goods {
+    color: $main-black;
+  }
+  .quantity {
+    width: 63px;
+    text-align: center;
+  }
+  .price {
+    font-family: Nunito Sans;
+    font-weight: bold;
+  }
+  button {
+    width: 26px;
+    height: 26px;
+    background-color: $border-color;
+    border-radius: 50%;
+  }
+  .ship-content,
+  .amount-content {
+    font-size: 0.85rem;
+    border-top: 1px solid $border-color;
+    justify-content: space-between;
+    align-items: center;
+    height: 52px;
+  }
+  .total-fee,
+  .shipping-fee {
+    font-weight: bold;
+  }
+}
+
+.btn-control {
+  border-top: 1px solid $border-color;
+
+  button {
+    background-color: $main-pink;
+    height: 46px;
+    margin: 20px;
+    width: 100%;
+    border-radius: 8px;
+    position: relative;
+    color: white;
+    font-size: 0.85rem;
+
+    &[disabled] {
+      opacity: 0;
+    }
+  }
+
+  .back::after {
+    content: "\2190";
+    position: absolute;
+    left: calc(50% - 50px);
+    top: calc(50% - 0.5rem);
+  }
+  .next::after {
+    content: "\2192";
+    position: absolute;
+    left: calc(50% + 35px);
+    top: calc(50% - 0.5rem);
+  }
+}
+
+/*---------- footer ----------*/
+.footer {
+  display: none;
+}
+
+/**************desktop*****************/
+@media screen and (min-width: 576px) {
+  header {
+    /* unset */
+    .nav-toggle-label {
+      display: none;
+    }
+    .nav,
+    .nav-list-left,
+    .nav-list-right,
+    .nav-list-main {
+      all: unset;
+      .nav-item,
+      .nav-item-icon {
+        all: unset;
+      }
+    }
+
+    .nav {
+      width: 80%;
+      height: 60px;
+      display: grid;
+      grid-template-columns: 40% minmax(140px, 1fr) 40%;
+      align-items: center;
+    }
+    .nav-list-left {
+      grid-column: 1 / 2;
+      display: flex;
+      width: 100%;
+      .nav-item {
+        font-size: 0.6rem;
+        margin-right: 10px;
+      }
+    }
+    .nav-list-main {
+      grid-column: 2 / 3;
+    }
+    .nav-list-right {
+      grid-column: 3 / 4;
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+  .main-content {
+    padding-top: 70px;
+    min-height: calc(100vh - 248px);
+  }
+
+  .form-panel,
+  .stepper-panel,
+  .cart-panel,
+  .btn-control {
+    padding: 0 60px;
+  }
+
+  .footer {
+    height: 248px;
+    width: 100%;
+    background-color: $border-color;
+    display: grid;
+    grid-template-columns: 0.6fr repeat(3, 90px) minmax(108px, 0.6fr);
+    padding: 0 30px;
+
+    .brand {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .brand img {
+      width: 135px;
+      margin-right: 2rem;
+    }
+    .item {
+      display: flex;
+      flex-direction: column;
+      padding-top: 70px;
+      .title {
+        font-size: 0.6rem;
+        color: $main-black;
+        font-weight: bolder;
+        margin-bottom: 8px;
+      }
+      a {
+        font-size: 0.5rem;
+        color: $light-gray;
+        margin-top: 0.1rem;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+  header {
+    .nav-list-left {
+      .nav-item {
+        font-size: 0.8rem;
+        margin-right: 18px;
+      }
+    }
+  }
+
+  .main-content {
+    width: 100%;
+    display: grid;
+    margin-left: 60px;
+    padding-top: 100px;
+    grid-template-columns: 50% 5% 45%;
+    grid-auto-rows: 15% 60% 25%;
+    grid-template-areas:
+      "step . ."
+      "form . cart"
+      "btn . cart";
+  }
+
+  .stepper-panel {
+    grid-area: step;
+
+    .step-title {
+      font-size: 32px;
+    }
+    .stepper-content {
+      margin-top: 18px;
+
+      .step {
+        font-size: 0.8rem;
+        .step-circle {
+          width: 24px;
+          height: 24px;
+          position: relative;
+        }
+        .connect-line {
+          margin: 12px 0.8em 0px 5.5em;
+        }
+        &:nth-child(1) .step-circle::before {
+          color: $main-black;
+          content: "寄送地址";
+          position: absolute;
+          width: 4rem;
+          left: 32px;
+        }
+        &:nth-child(2) .step-circle::before {
+          color: $main-black;
+          content: "運送方式";
+          position: absolute;
+          width: 4rem;
+          left: 32px;
+        }
+        &:nth-child(3) .step-circle::before {
+          color: $main-black;
+          content: "付款資訊";
+          position: absolute;
+          width: 4rem;
+          left: 32px;
+        }
+      }
+    }
+  }
+
+  .form-panel {
+    grid-area: form;
+    margin-top: 64px;
+    overflow: scroll;
+  }
+
+  form {
+    .part-a {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: 0.5fr 1fr 1fr 1fr;
+      grid-gap: 0.8rem 1.5rem;
+
+      grid-template-areas:
+        "title title title . . ."
+        "user-title user-title name name name name"
+        "phone phone phone email email email"
+        "city city address address address address";
+
+      @each $name in $form-list {
+        .#{$name} {
+          grid-area: #{$name};
+        }
+      }
+
+      .form-item {
+        display: flex;
+        flex-direction: column;
+      }
+      .credit-card-hloder,
+      .credit-card-number {
+        max-width: 375px;
+      }
+    }
+  }
+
+  .cart-panel {
+    grid-area: cart;
+    position: relative;
+
+    .cart-container {
+      height: 492px;
+      padding-top: 68px;
+    }
+    &::after {
+      position: absolute;
+      content: "購物籃";
+      font-size: 18px;
+      font-weight: bold;
+      top: 25px;
+      left: 100px;
+    }
+    .cart-content {
+      height: 100%;
+      overflow-y: scroll;
+    }
+    .cart-detail {
+      padding-left: 10px;
+      display: grid;
+      grid-template-columns: 1fr 10px 65px;
+      grid-template-rows: 25px 75px;
+      grid-template-areas:
+        "goods . price"
+        "btn . .";
+
+      .goods {
+        grid-area: goods;
+        height: 1.3rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .add-cart-btn {
+        grid-area: btn;
+        align-self: center;
+      }
+      .price {
+        grid-area: price;
+      }
+    }
+  }
+
+  .btn-control {
+    grid-area: btn;
+    justify-content: space-between;
+
+    button {
+      width: 174px;
+    }
+  }
+
+  .footer {
+    grid-gap: 10px;
+    padding: 0 100px;
+  }
+}
+
+
+// form {
+//   .part a, .part {
+//     &.d-none {
+//       display: none ;
+//     }
+//   } 
+// }
+.d-none {
+  display: none !important; /*override grid area*/
+}
